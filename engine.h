@@ -6,31 +6,46 @@
 #ifndef ENGINE_H_INCLUDED
 #define ENGINE_H_INCLUDED
 //---------------------------------------------------------
-#include <graphics.h>
 #include <iostream>
+#include <fstream>
 #include <stdarg.h>
 #include <time.h>
+#include <graphics.h>
 //---------------------------------------------------------
 void Randomize();
-void Init(int width, int height, int color, char *name);
-void Close(void);
-void Wait(void);
-void Clear(void);
-void Buffer(void);
-void Write(char *text);
 char* IntToChr(int c);
+int ChrToInt(char *ch);
+std::string IntToStr(int c);
 void PrintLog(const char *s1, ...);
 //---------------------------------------------------------
+//=====================================
 class SWorld {
  public:
-  int w, h;   // window width
-  int bcolor; // window height
+  int w, h;   // width, height
+  int bcolor; // bg color
+  int tcolor; // text color
   char *name; // window name
+  int cycles; // iterations
+  int count;  // count of units
+  int fpause; // pause
+  //***************************
   SWorld();
   SWorld(int width, 
          int height, 
-         int background,
-         char *s);      
+         int backgroundclr,
+         int textclr,
+         int iterations,
+         int pause,
+         int objcount,        
+         const char *s);  
+  //***************************
+  void Init(void);
+  void Close(void);
+  void Wait(void);
+  void Clear(void);
+  void Buffer(void);
+  void Write(char *text);
+  void Delay();
 };
 //=====================================
 class SUnit {
@@ -101,6 +116,30 @@ class SUnitT: public SUnit {
   ) {};
 };
 //=====================================
+class SUnitR: public SUnit {
+ public:
+  void Draw(void);
+  //***************************
+  SUnitR():SUnit() {};
+  SUnitR(
+   int xc, int yc,
+   int health, 
+   int damage, 
+   int energy, 
+   int radars,
+   int colors,
+   int size,
+   int team
+  ): SUnit ( xc, yc,  
+             health, damage, 
+             energy, radars,
+             colors, size, team
+  ) {};
+};
+//=====================================
+//---------------------------------------------------------
+SWorld *LoadWorldFromFile(std::string path);
+SUnit *LoadUnitFromFile(std::string path);
 //---------------------------------------------------------
 #endif // ENGINE_H_INCLUDED
 //---------------------------------------------------------
