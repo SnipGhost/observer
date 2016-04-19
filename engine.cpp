@@ -67,6 +67,10 @@ void PrintLog(const char *s1, ...) {
  va_end(ap);
 }
 //---------------------------------------------------------
+void PrintLog(std::string s1) {
+ std::cout << s1 << std::endl;
+}
+//---------------------------------------------------------
 SWorld *LoadWorldFromFile(std::string path) {
  std::ifstream fin;
  fin.open(path.c_str());
@@ -88,7 +92,7 @@ SWorld *LoadWorldFromFile(std::string path) {
 SUnit *LoadUnitFromFile(std::string path) {
  std::ifstream fin;
  fin.open(path.c_str());
- int x, y;
+ int x, y, v;
  int hp;
  int dp;
  int ep;
@@ -98,13 +102,14 @@ SUnit *LoadUnitFromFile(std::string path) {
  int n;
  int t;
  fin >> t;
- fin >> x >> y >> hp >> dp >> ep >> rp;
+ fin >> x >> y >> v;
+ fin >> hp >> dp >> ep >> rp;
  fin >> c >> k >> n;
  fin.close();
  PrintLog("Try to load unit from ", path.c_str(), 0);
- if (t==0) return (new SUnitD(x,y,hp,dp,ep,rp,c,k,n));
- if (t==1) return (new SUnitT(x,y,hp,dp,ep,rp,c,k,n));
- if (t==3) return (new SUnitR(x,y,hp,dp,ep,rp,c,k,n));
+ if (t==0) return (new SUnitD(x,y,v,hp,dp,ep,rp,c,k,n));
+ if (t==1) return (new SUnitT(x,y,v,hp,dp,ep,rp,c,k,n));
+ if (t==3) return (new SUnitR(x,y,v,hp,dp,ep,rp,c,k,n));
  return 0;
 }
 //---------------------------------------------------------
@@ -190,6 +195,7 @@ SUnit::SUnit() {
  PrintLog("Unit ", IntToChr(nteam+1), " initialized", 0);           
 }
 SUnit::SUnit(int xc, int yc,
+             int velocity,
              int health, 
              int damage, 
              int energy, 
@@ -199,6 +205,7 @@ SUnit::SUnit(int xc, int yc,
              int team) {
  x = xc;
  y = yc;
+ vmax = velocity;
  hp = health;
  dp = damage;
  ep = energy;
@@ -207,6 +214,33 @@ SUnit::SUnit(int xc, int yc,
  ksize = size;
  nteam = team;  
  PrintLog("Unit ", IntToChr(nteam+1), " initialized", 0);                  
+}
+//---------------------------------------------------------
+void SUnit::Move(int xp, int yp) {
+ int dx = xp - x, dy = yp - y;
+ int vx = vmax/2, vy = vmax/2;
+ if (dx == 0) vy = vmax;
+ if (dy == 0) vx = vmax;
+ if (abs(dx) > 0 || abs(dy) > 0) {
+  bool od = 1;
+  if (abs(dx) < vx) {
+   vy += (vx - abs(dx));
+   vx = abs(dx);
+   od = 0;
+  }
+  if (abs(dy) < vy) {
+   if (od) vx += (vy - abs(dy));
+   vy = abs(dy);      
+  }
+  if (dx != 0 && dy != 0) {
+   if (abs(dx) > abs(dy)) vx += vmax%2;
+   else vy += vmax%2;     
+  }
+  if (dx > 0) x += vx;
+  else if (dx < 0) x -= vx;
+  if (dy > 0) y += vy;
+  else if (dy < 0) y -= vy;
+ }
 }
 //---------------------------------------------------------
 void SUnitD::Draw(void) {

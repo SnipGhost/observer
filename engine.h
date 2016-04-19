@@ -10,6 +10,7 @@
 #include <fstream>
 #include <stdarg.h>
 #include <time.h>
+#include <math.h>
 #include <graphics.h>
 //---------------------------------------------------------
 void Randomize();
@@ -17,6 +18,7 @@ char* IntToChr(int c);
 int ChrToInt(char *ch);
 std::string IntToStr(int c);
 void PrintLog(const char *s1, ...);
+void PrintLog(std::string s1);
 //---------------------------------------------------------
 //=====================================
 class SWorld {
@@ -51,6 +53,7 @@ class SWorld {
 class SUnit {
  public:
   int x, y;    // coordinates
+  int vmax;    // max velocity
   int hp;      // health points
   int dp;      // damage points
   int ep;      // energy points
@@ -60,10 +63,12 @@ class SUnit {
   int nteam;   // team number
   //***************************
   virtual void Draw(void) = 0;
+  void Move(int xp, int yp);
   //***************************
   SUnit();
   SUnit(
    int xc, int yc,
+   int velocity,
    int health, 
    int damage, 
    int energy, 
@@ -81,6 +86,7 @@ class SUnitD: public SUnit {
   SUnitD():SUnit() {};
   SUnitD(
    int xc, int yc,
+   int velocity,
    int health, 
    int damage, 
    int energy, 
@@ -88,7 +94,7 @@ class SUnitD: public SUnit {
    int colors,
    int size,
    int team
-  ): SUnit ( xc, yc,  
+  ): SUnit ( xc, yc, velocity, 
              health, damage, 
              energy, radars,
              colors, size, team
@@ -102,6 +108,7 @@ class SUnitT: public SUnit {
   SUnitT():SUnit() {};
   SUnitT(
    int xc, int yc,
+   int velocity,
    int health, 
    int damage, 
    int energy, 
@@ -109,7 +116,7 @@ class SUnitT: public SUnit {
    int colors,
    int size,
    int team
-  ): SUnit ( xc, yc,  
+  ): SUnit ( xc, yc, velocity, 
              health, damage, 
              energy, radars,
              colors, size, team
@@ -123,6 +130,7 @@ class SUnitR: public SUnit {
   SUnitR():SUnit() {};
   SUnitR(
    int xc, int yc,
+   int velocity,
    int health, 
    int damage, 
    int energy, 
@@ -130,7 +138,7 @@ class SUnitR: public SUnit {
    int colors,
    int size,
    int team
-  ): SUnit ( xc, yc,  
+  ): SUnit ( xc, yc, velocity, 
              health, damage, 
              energy, radars,
              colors, size, team

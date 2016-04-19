@@ -4,6 +4,7 @@
 //                                      (C) SnipGhost, 2016
 //---------------------------------------------------------
 #include "engine.h"
+using namespace std;
 //---------------------------------------------------------
 int main(int argc, char *argv[])
 { 
@@ -13,11 +14,10 @@ int main(int argc, char *argv[])
  //========================================================
  World = LoadWorldFromFile("data/test/world.txt");
  //========================================================
- const int count = World->count;
- Unit = new SUnit *[count];
- PrintLog("Create ", IntToChr(count), " objects ...", 0);
- for (int i = 0; i < count; i++) {
-  std::string s = "data/test/unit"+IntToStr(i+1)+".txt";
+ Unit = new SUnit *[World->count];
+ PrintLog("Create "+IntToStr(World->count)+" objects ...");
+ for (int i = 0; i < World->count; i++) {
+  string s = "data/test/unit"+IntToStr(i+1)+".txt";
   Unit[i] = LoadUnitFromFile(s);
  }
  PrintLog("Creating objects successfully completed", 0);
@@ -27,14 +27,13 @@ int main(int argc, char *argv[])
  //========================================================
  int c = World->cycles;
  if (argc > 1) c = ChrToInt(argv[1]);
- PrintLog("Run for ", IntToChr(c), " iterations", 0);
+ PrintLog("Run for " + IntToStr(c) + " iterations");
  //========================================================
  while (c > 0) {
   c--;
   World->Clear();
-  for (int i = 0; i < count; i++) {
-   Unit[i]->x += (rand()%3 - rand()%3);
-   Unit[i]->y += (rand()%3 - rand()%3);
+  for (int i = 0; i < World->count; i++) {
+   Unit[i]->Move(300-i*40+rand()%40, 100+i*40+rand()%40);
    Unit[i]->Draw();
   }
   World->Buffer();
@@ -48,7 +47,7 @@ int main(int argc, char *argv[])
  PrintLog("Simulation stop", 0);
  //========================================================
  World->Close();
- for (int i = 0; i < count; i++) delete Unit[i];
+ for (int i = 0; i < World->count; i++) delete Unit[i];
  delete[] Unit;
  delete World;
  return 0;
